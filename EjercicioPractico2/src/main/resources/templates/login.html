@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Iniciar Sesión</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h2>Plataforma Académica - Login</h2>
+
+<form th:action="@{/login}" method="post">
+
+    <label>Correo:</label>
+    <input type="text" name="correo" required>
+
+    <br><br>
+
+    <label>Contraseña:</label>
+    <input type="password" name="password" required>
+
+    <br><br>
+
+    <button type="submit">Ingresar</button>
+
+</form>
+
+<!-- Mensajes -->
+<div th:if="${param.error}">
+    <p style="color:red;">Credenciales incorrectas</p>
+</div>
+
+<div th:if="${param.logout}">
+    <p style="color:green;">Sesión cerrada correctamente</p>
+</div>
+
+</body>
+</html>
