@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios por Rol</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar { background: #333; color: white; padding: 10px; margin-bottom: 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; margin: 5px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-danger { background: #dc3545; color: white; }
+        .rol-info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a th:href="@{/home}">Inicio</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/usuarios}">Usuarios</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/roles}">Roles</a>
+        <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/reportes}">Reportes</a>
+        <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/consultas}">Consultas</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/perfil}">Mi Perfil</a>
+        <span style="float: right;">
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </span>
+    </div>
+
+    <h1>Usuarios por Rol</h1>
+    
+    <div class="rol-info">
+        <h3>Rol: <span th:text="${rolNombre}"></span></h3>
+        <p>Total de usuarios con este rol: <strong th:text="${usuarios != null ? usuarios.size() : 0}"></strong></p>
+    </div>
+    
+    <div th:if="${usuarios != null and !usuarios.isEmpty()}">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>Fecha Creación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td th:text="${usuario.id}"></td>
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.apellido}"></td>
+                    <td th:text="${usuario.email}"></td>
+                    <td>
+                        <span th:if="${usuario.activo}" class="badge badge-success">Activo</span>
+                        <span th:unless="${usuario.activo}" class="badge badge-danger">Inactivo</span>
+                    </td>
+                    <td th:text="${#dates.format(usuario.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/usuarios/editar/{id}(id=${usuario.id})}" class="btn btn-primary">Editar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div th:if="${usuarios != null and usuarios.isEmpty()}">
+        <p>No hay usuarios con el rol <strong th:text="${rolNombre}"></strong>.</p>
+    </div>
+    
+    <br>
+    <a th:href="@{/consultas}" class="btn btn-secondary">Volver a Consultas</a>
+    <a th:href="@{/home}" class="btn btn-primary">Volver al Inicio</a>
+</body>
+</html>

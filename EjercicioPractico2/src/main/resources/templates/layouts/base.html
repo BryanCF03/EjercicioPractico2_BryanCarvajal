@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null} ? ${pageTitle} : 'Plataforma Académica'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a th:href="@{/home}">🏠 Inicio</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/usuarios}">👥 Usuarios</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/roles}">🎭 Roles</a>
+            <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/reportes}">📊 Reportes</a>
+            <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/consultas}">🔍 Consultas</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/perfil}">👤 Mi Perfil</a>
+            
+            <span style="float: right;">
+                <span sec:authorize="isAuthenticated()" style="margin-right: 15px;">
+                    👋 <strong sec:authentication="name"></strong>
+                </span>
+                <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">🚪 Cerrar Sesión</button>
+                </form>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Header Principal -->
+    <header class="main-header" th:if="${showHeader != false}">
+        <div class="container">
+            <h1 th:text="${pageTitle != null} ? ${pageTitle} : 'Plataforma Académica'"></h1>
+            <p th:if="${pageSubtitle}" th:text="${pageSubtitle}"></p>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container">
+        <!-- Mensajes Flash -->
+        <div th:if="${mensaje}" class="alert alert-success fade-in">
+            <strong>✓</strong> <span th:text="${mensaje}"></span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger fade-in">
+            <strong>✗</strong> <span th:text="${error}"></span>
+        </div>
+        
+        <!-- Contenido específico de cada página -->
+        <div layout:fragment="content">
+            <!-- Aquí va el contenido específico de cada página -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 20px; margin-top: 40px; color: #7f8c8d;">
+        <p>© 2023 Plataforma Académica - Gestión de Usuarios y Roles</p>
+        <p>Sistema desarrollado para el ejercicio práctico de Desarrollo de Aplicaciones Web</p>
+    </footer>
+</body>
+</html>

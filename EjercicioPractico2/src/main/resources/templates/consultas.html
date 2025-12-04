@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar { background: #333; color: white; padding: 10px; margin-bottom: 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        .search-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="date"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #28a745; color: white; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a th:href="@{/home}">Inicio</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/usuarios}">Usuarios</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/roles}">Roles</a>
+        <a th:href="@{/reportes}">Reportes</a>
+        <a th:href="@{/consultas}">Consultas</a>
+        <a th:href="@{/perfil}">Mi Perfil</a>
+        <span style="float: right;">
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </span>
+    </div>
+
+    <h1>Consultas Avanzadas</h1>
+    
+    <div th:if="${error}" class="error">
+        <strong>Error:</strong> <span th:text="${error}"></span>
+    </div>
+    
+    <div class="search-box">
+        <h3>Búsqueda de Usuarios</h3>
+        <form th:action="@{/consultas/buscar}" method="post">
+            <div class="form-group">
+                <label>Buscar por nombre, apellido o email:</label>
+                <input type="text" name="texto" placeholder="Ej: Ana, Soto, ana@...">
+            </div>
+            
+            <div class="form-group">
+                <label>Buscar por rango de fechas:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="date" name="fechaInicio">
+                    <input type="date" name="fechaFin">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+    
+    <h3>Usuarios Ordenados por Fecha (más recientes primero)</h3>
+    <table th:if="${usuariosOrdenados != null and !usuariosOrdenados.isEmpty()}">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Fecha Creación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="usuario : ${usuariosOrdenados}">
+                <td th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></td>
+                <td th:text="${usuario.email}"></td>
+                <td th:text="${usuario.rol.nombre}"></td>
+                <td th:text="${#dates.format(usuario.fechaCreacion, 'dd/MM/yyyy')}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <p th:if="${usuariosOrdenados == null or usuariosOrdenados.isEmpty()}">
+        No hay usuarios registrados.
+    </p>
+    
+    <h3>Usuarios por Estado</h3>
+    <a th:href="@{/consultas/por-rol?rol=ADMIN}" class="btn btn-success">Ver ADMINs</a>
+    <a th:href="@{/consultas/por-rol?rol=PROFESOR}" class="btn btn-success">Ver PROFESORes</a>
+    <a th:href="@{/consultas/por-rol?rol=ESTUDIANTE}" class="btn btn-success">Ver ESTUDIANTEs</a>
+</body>
+</html>

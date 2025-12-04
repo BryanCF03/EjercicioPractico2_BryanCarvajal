@@ -1,44 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Formulario Usuario</title>
     <meta charset="UTF-8">
+    <title th:text="${usuario.id != null} ? 'Editar Usuario' : 'Crear Usuario'"></title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar { background: #333; color: white; padding: 10px; margin-bottom: 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        form { max-width: 600px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="email"], input[type="password"], select {
+            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;
+        }
+        .error { color: red; font-size: 14px; }
+    </style>
 </head>
 <body>
+    <div class="navbar">
+        <a th:href="@{/home}">Inicio</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+        <a th:href="@{/roles}">Roles</a>
+        <span style="float: right;">
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </span>
+    </div>
 
-<h2 th:text="${usuario.id == null ? 'Crear Usuario' : 'Editar Usuario'}"></h2>
-
-<form th:action="@{/usuarios/guardar}" method="post" th:object="${usuario}">
-
-    <input type="hidden" th:field="*{id}">
-
-    <label>Nombre:</label>
-    <input type="text" th:field="*{nombre}" required>
-    <br><br>
-
-    <label>Correo:</label>
-    <input type="email" th:field="*{correo}" required>
-    <br><br>
-
-    <label>Contraseña:</label>
-    <input type="password" th:field="*{password}" required>
-    <br><br>
-
-    <label>Rol:</label>
-    <select th:field="*{rol}" required>
-        <option th:each="r : ${roles}"
-                th:value="${r.id}"
-                th:text="${r.nombre}">
-        </option>
-    </select>
-
-    <br><br>
-
-    <button type="submit">Guardar</button>
-</form>
-
-<br>
-<a th:href="@{/usuarios}">Volver</a>
-
+    <h1 th:text="${usuario.id != null} ? 'Editar Usuario' : 'Crear Nuevo Usuario'"></h1>
+    
+    <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+        <input type="hidden" th:field="*{id}">
+        
+        <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" th:field="*{nombre}" required>
+            <div class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>Apellido:</label>
+            <input type="text" th:field="*{apellido}" required>
+            <div class="error" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" required>
+            <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" th:field="*{password}" 
+                   th:required="${usuario.id == null}" 
+                   th:placeholder="${usuario.id != null} ? 'Dejar vacío para mantener la actual' : ''">
+            <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        </div>
+        
+        <div class="form-group" th:if="${usuario.id == null}">
+            <label>Confirmar Contraseña:</label>
+            <input type="password" name="confirmarPassword" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Rol:</label>
+            <select th:field="*{rol.id}" required>
+                <option value="">Seleccionar Rol</option>
+                <option th:each="rol : ${roles}" 
+                        th:value="${rol.id}" 
+                        th:text="${rol.nombre}"
+                        th:selected="${usuario.rol != null and usuario.rol.id == rol.id}">
+                </option>
+            </select>
+            <div class="error" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" th:field="*{activo}"> Activo
+            </label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a th:href="@{/usuarios}" class="btn btn-secondary">Cancelar</a>
+    </form>
 </body>
 </html>

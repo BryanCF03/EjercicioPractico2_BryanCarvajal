@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head>
+    <title>Plataforma Académica - Inicio</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div sec:authorize="!isAuthenticated()">
+            <div class="login-container">
+                <div class="login-box">
+                    <h2>Bienvenido a la Plataforma Académica</h2>
+                    <p style="text-align: center; margin-bottom: 30px;">
+                        Sistema de gestión de usuarios y roles para instituciones educativas
+                    </p>
+                    <div style="text-align: center;">
+                        <a th:href="@{/login}" class="btn btn-primary" style="padding: 15px 30px; font-size: 1.1rem;">
+                            🚀 Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div sec:authorize="isAuthenticated()">
+            <h2>Dashboard Principal</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Usuarios Totales</h3>
+                    <div class="stat-value" th:text="${#numbers.formatInteger(totalUsuarios, 0)}">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Usuarios Activos</h3>
+                    <div class="stat-value" th:text="${#numbers.formatInteger(usuariosActivos, 0)}">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Usuarios Inactivos</h3>
+                    <div class="stat-value" th:text="${#numbers.formatInteger(usuariosInactivos, 0)}">0</div>
+                </div>
+            </div>
+            
+            <h3>Acciones Rápidas</h3>
+            <div class="quick-actions">
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/usuarios}" class="btn btn-primary">👥 Gestionar Usuarios</a>
+                    <a th:href="@{/roles}" class="btn btn-primary">🎭 Gestionar Roles</a>
+                </div>
+                <div sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')">
+                    <a th:href="@{/reportes}" class="btn btn-success">📊 Ver Reportes</a>
+                    <a th:href="@{/consultas}" class="btn btn-success">🔍 Consultas Avanzadas</a>
+                </div>
+                <div sec:authorize="isAuthenticated()">
+                    <a th:href="@{/perfil}" class="btn btn-warning">👤 Mi Perfil</a>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 30px;">
+                <h3>Información del Usuario</h3>
+                <p><strong>Usuario:</strong> <span sec:authentication="name"></span></p>
+                <p><strong>Roles:</strong> <span sec:authentication="principal.authorities"></span></p>
+                <p><strong>Último acceso:</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

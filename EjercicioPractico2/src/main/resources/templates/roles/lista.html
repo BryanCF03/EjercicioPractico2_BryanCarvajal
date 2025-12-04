@@ -1,40 +1,59 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Roles</title>
     <meta charset="UTF-8">
+    <title>Gestión de Roles</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar { background: #333; color: white; padding: 10px; margin-bottom: 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+    </style>
 </head>
 <body>
+    <div class="navbar">
+        <a th:href="@{/home}">Inicio</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+        <a th:href="@{/roles}">Roles</a>
+        <span style="float: right;">
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </span>
+    </div>
 
-<h2>Lista de Roles</h2>
-
-<a th:href="@{/roles/crear}">Crear Rol</a>
-<br><br>
-
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr th:each="r : ${roles}">
-            <td th:text="${r.id}"></td>
-            <td th:text="${r.nombre}"></td>
-
-            <td>
-                <a th:href="@{/roles/editar/{id}(id=${r.id})}">Editar</a> |
-                <a th:href="@{/roles/eliminar/{id}(id=${r.id})}">Eliminar</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-<br>
-<a th:href="@{/inicio}">Volver</a>
-
+    <h1>Gestión de Roles</h1>
+    
+    <a th:href="@{/roles/crear}" class="btn btn-success">Crear Nuevo Rol</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="rol : ${roles}">
+                <td th:text="${rol.id}"></td>
+                <td th:text="${rol.nombre}"></td>
+                <td th:text="${rol.descripcion}"></td>
+                <td>
+                    <a th:href="@{/roles/editar/{id}(id=${rol.id})}" class="btn btn-warning">Editar</a>
+                    <a th:href="@{/roles/eliminar/{id}(id=${rol.id})}" class="btn btn-danger" 
+                       onclick="return confirm('¿Está seguro de eliminar este rol?')">Eliminar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

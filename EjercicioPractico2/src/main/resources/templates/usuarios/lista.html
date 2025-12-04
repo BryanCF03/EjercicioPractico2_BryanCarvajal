@@ -1,44 +1,76 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Usuarios</title>
     <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar { background: #333; color: white; padding: 10px; margin-bottom: 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-info { background: #17a2b8; color: white; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-danger { background: #dc3545; color: white; }
+    </style>
 </head>
 <body>
+    <div class="navbar">
+        <a th:href="@{/home}">Inicio</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+        <a th:href="@{/roles}">Roles</a>
+        <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/reportes}">Reportes</a>
+        <a sec:authorize="hasAnyRole('ADMIN', 'PROFESOR')" th:href="@{/consultas}">Consultas</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/perfil}">Mi Perfil</a>
+        <span style="float: right;">
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </span>
+    </div>
 
-<h2>Lista de Usuarios</h2>
-
-<a th:href="@{/usuarios/crear}">Crear Usuario</a>
-<br><br>
-
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr th:each="u : ${usuarios}">
-            <td th:text="${u.id}"></td>
-            <td th:text="${u.nombre}"></td>
-            <td th:text="${u.correo}"></td>
-            <td th:text="${u.rol.nombre}"></td>
-
-            <td>
-                <a th:href="@{/usuarios/editar/{id}(id=${u.id})}">Editar</a> |
-                <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}">Eliminar</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-<br>
-<a th:href="@{/inicio}">Volver</a>
-
+    <h1>Gestión de Usuarios</h1>
+    
+    <a th:href="@{/usuarios/crear}" class="btn btn-success">Crear Nuevo Usuario</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.id}"></td>
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.apellido}"></td>
+                <td th:text="${usuario.email}"></td>
+                <td th:text="${usuario.rol.nombre}"></td>
+                <td>
+                    <span th:if="${usuario.activo}" class="badge badge-success">Activo</span>
+                    <span th:unless="${usuario.activo}" class="badge badge-danger">Inactivo</span>
+                </td>
+                <td>
+                    <a th:href="@{/usuarios/editar/{id}(id=${usuario.id})}" class="btn btn-warning">Editar</a>
+                    <a th:href="@{/usuarios/eliminar/{id}(id=${usuario.id})}" class="btn btn-danger" 
+                       onclick="return confirm('¿Está seguro de eliminar este usuario?')">Eliminar</a>
+                    <a th:href="@{/usuarios/detalle/{id}(id=${usuario.id})}" class="btn btn-info">Detalle</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

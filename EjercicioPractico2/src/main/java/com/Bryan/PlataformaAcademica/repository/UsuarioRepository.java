@@ -13,51 +13,36 @@ import java.util.List;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
-    // CONSULTAS DERIVADAS (Requisito D del PDF)
-    
-    // 1. Buscar usuarios por rol (Requisito: Buscar usuarios por rol)
+    // Consultas básicas
+    Usuario findByEmail(String email);
     List<Usuario> findByRol(Rol rol);
+    List<Usuario> findByNombreContainingIgnoreCase(String texto);
     
-    // 2. Buscar usuarios creados en un rango de fechas (Requisito: Buscar usuarios creados en un rango de fechas)
+    // Consultas requeridas
     List<Usuario> findByFechaCreacionBetween(LocalDateTime inicio, LocalDateTime fin);
     
-    // 3. Buscar usuarios por coincidencia parcial en correo o nombre (Requisito: Buscar usuarios por coincidencia parcial en correo o nombre)
-    List<Usuario> findByEmailContainingIgnoreCaseOrNombreContainingIgnoreCase(String email, String nombre);
+    // Consulta simplificada para buscar por texto
+    @Query("SELECT u FROM Usuario u WHERE LOWER(u.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) " +
+           "OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :texto, '%')) " +
+           "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :texto, '%'))")
+    List<Usuario> buscarPorTexto(@Param("texto") String texto);
     
-    // 4. Contar usuarios activos (Requisito: Contar usuarios activos vs inactivos)
     int countByActivoTrue();
     int countByActivoFalse();
     
-    // 5. Obtener usuarios ordenados por fecha de creación (Requisito: Obtener usuarios ordenados por fecha de creación)
     List<Usuario> findAllByOrderByFechaCreacionDesc();
     
-    // 6. Buscar usuario por email (para login)
-    Usuario findByEmail(String email);
-    
-    // 7. Contar usuarios por rol
-    int countByRol(Rol rol);
-    
-    // 8. Buscar por nombre que contenga texto
-    List<Usuario> findByNombreContainingIgnoreCase(String texto);
-    
-    // 9. Buscar por apellido que contenga texto
-    List<Usuario> findByApellidoContainingIgnoreCase(String texto);
-    
-    // 10. Buscar usuarios activos
     List<Usuario> findByActivoTrue();
-    
-    // 11. Buscar usuarios inactivos
     List<Usuario> findByActivoFalse();
     
-    // CONSULTA PERSONALIZADA CON JPQL (Ejemplo adicional)
-    @Query("SELECT u FROM Usuario u WHERE LOWER(u.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :texto, '%'))")
-    List<Usuario> buscarPorNombreOApellido(@Param("texto") String texto);
-    
-    // Consulta para reporte estadístico
-    @Query("SELECT r.nombre, COUNT(u) FROM Usuario u JOIN u.rol r GROUP BY r.nombre")
+    // Estadísticas por rol - consulta simplificada
+    @Query("SELECT r.nombre, COUNT(u) FROM Usuario u JOIN u.rol r GROUP BY r.id")
     List<Object[]> contarUsuariosPorRol();
     
-    // Consulta para usuarios recientes (últimos 7 días)
-    @Query("SELECT u FROM Usuario u WHERE u.fechaCreacion >= :fechaInicio ORDER BY u.fechaCreacion DESC")
+    // Usuarios recientes
+    @Query("SELECT u FROM Usuario u WHERE u.fechaCreacion >= :fechaInicio")
     List<Usuario> findUsuariosRecientes(@Param("fechaInicio") LocalDateTime fechaInicio);
+    
+    // Contar por rol
+    int countByRol(Rol rol);
 }

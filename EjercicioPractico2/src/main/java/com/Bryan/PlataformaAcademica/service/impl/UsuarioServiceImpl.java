@@ -8,7 +8,9 @@ import com.Bryan.PlataformaAcademica.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,7 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (rol != null) {
             return usuarioRepository.findByRol(rol);
         }
-        return List.of();
+        return new ArrayList<>();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public List<Usuario> buscarPorTexto(String texto) {
-        return usuarioRepository.findByEmailContainingIgnoreCaseOrNombreContainingIgnoreCase(texto, texto);
+        return usuarioRepository.buscarPorTexto(texto);
     }
 
     @Override

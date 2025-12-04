@@ -1,5 +1,7 @@
 package com.Bryan.PlataformaAcademica.controller;
 
+import com.Bryan.PlataformaAcademica.service.UsuarioService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -9,15 +11,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     @GetMapping("/home")
     public String home(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         String role = auth.getAuthorities().toString();
         
+        long totalUsuarios = usuarioService.contarTotalUsuarios();
+        long usuariosActivos = usuarioService.contarUsuariosActivos();
+        long usuariosInactivos = usuarioService.contarUsuariosInactivos();
+        
         model.addAttribute("username", username);
         model.addAttribute("role", role);
-        model.addAttribute("pageTitle", "Inicio - Plataforma Académica");
+        model.addAttribute("totalUsuarios", totalUsuarios);
+        model.addAttribute("usuariosActivos", usuariosActivos);
+        model.addAttribute("usuariosInactivos", usuariosInactivos);
+        model.addAttribute("pageTitle", "Dashboard - Plataforma Académica");
         
         return "home";
     }
@@ -28,7 +40,8 @@ public class HomeController {
     }
     
     @GetMapping("/acceso-denegado")
-    public String accesoDenegado() {
+    public String accesoDenegado(Model model) {
+        model.addAttribute("pageTitle", "Acceso Denegado");
         return "acceso-denegado";
     }
 }
